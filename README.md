@@ -4,7 +4,7 @@
 
 # 스택
 
-- Spring boot 2.5.4 (학습은 2.1으로 진행되며 2.2로 업데이트 되었으나 너무 예전 버전이라 본인은 2.5로 진행)
+- Spring boot 2.5.4 (학습은 2.1으로 진행되며 2.2로 업데이트 되었으나 본인은 2.5로 진행)
 - Spring Web
 - Spring Data JPA
 - Spring HATEOAS
@@ -22,3 +22,7 @@
 - JUnit 4, 5
 - REST Docs
 - Spring Security, OAuth2
+
+# 브랜치
+
+- 챕터별로 분리하여 진행 후 main으로 Merge
