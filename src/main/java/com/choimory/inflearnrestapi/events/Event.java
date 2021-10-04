@@ -1,8 +1,7 @@
-package com.choimory.inflearnrestapi.event;
+package com.choimory.inflearnrestapi.events;
 
 import lombok.*;
 
-import javax.persistence.Entity;
 import java.time.LocalDateTime;
 
 @Builder

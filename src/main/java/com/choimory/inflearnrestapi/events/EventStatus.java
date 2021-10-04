@@ -1,4 +1,4 @@
-package com.choimory.inflearnrestapi.event;
+package com.choimory.inflearnrestapi.events;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
