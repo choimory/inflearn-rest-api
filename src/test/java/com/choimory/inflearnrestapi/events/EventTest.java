@@ -1,8 +1,7 @@
-package com.choimory.inflearnrestapi.event;
+package com.choimory.inflearnrestapi.events;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*; // JUnit 5 기본 Assertions
+
 import static org.assertj.core.api.Assertions.*; // AssertJ 제공 Assertions
 
 public class EventTest {

@@ -1,4 +1,4 @@
-package com.choimory.inflearnrestapi.event;
+package com.choimory.inflearnrestapi.events;
 
 import lombok.*;
 
@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
-@Data
 public class Event {
     private Long id;
     private String name;
@@ -20,8 +19,8 @@ public class Event {
     private LocalDateTime beginEventDateTime;
     private LocalDateTime endEventDateTime;
     private String location;
-    private Integer basePrice;
-    private Integer maxPrice;
+    private int basePrice;
+    private int maxPrice;
     private Integer limitOfEnrollment;
     private boolean offline;
     private boolean free;
