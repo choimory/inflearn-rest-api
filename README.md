@@ -17,12 +17,17 @@
 # 학습 내용
 
 - REST API
+- TDD
 - HTTP Status
 - HATEOAS
-- JUnit 4, 5
 - REST Docs
-- Spring Security, OAuth2
+- Spring Security
+- OAuth2
 
 # 브랜치
 
 - 챕터별로 분리하여 진행 후 main으로 Merge
+
+# 학습자료
+
+- study-docs 디렉토리에 챕터별로 분리하여 Markdown 작성
