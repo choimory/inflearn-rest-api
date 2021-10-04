@@ -21,7 +21,10 @@ public class EventController {
 
     @PostMapping
     public ResponseEntity<Event> createEvent(@RequestBody(required = false) Event param){
+        //HATEOAS
         URI uri = linkTo(EventController.class).slash("${id}").toUri();
+
+        //for test code
         param.setId(10L);
 
         return ResponseEntity.created(uri)
