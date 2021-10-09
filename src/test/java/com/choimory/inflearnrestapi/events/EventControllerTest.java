@@ -45,8 +45,8 @@ class EventControllerTest {
     @Test
     void createEvent() throws Exception {
         //Given
-        Event param = Event.builder()
-                .id(100L)
+        /*Event param = Event.builder()
+                //.id(100L)
                 .name("Spring")
                 .description("Inflearn REST API study with Spring")
                 .beginEnrollmentDateTime(LocalDateTime.of(2021,10,4,19,32))
@@ -56,11 +56,26 @@ class EventControllerTest {
                 .maxPrice(200)
                 .limitOfEnrollment(100)
                 .location("강남역 D2 스타트업 팩토리")
-                .free(true)
-                .offline(false)
+                //.free(true)
+                //.offline(false)
+                .build();*/
+
+        EventRequestDto param = EventRequestDto.builder()
+                //.id(100L)
+                .name("Spring")
+                .description("Inflearn REST API study with Spring")
+                .beginEnrollmentDateTime(LocalDateTime.of(2021,10,4,19,32))
+                .closeEnrollmentDateTime(LocalDateTime.of(2021, 10, 4, 22, 0))
+                .beginEventDateTime(LocalDateTime.of(2021, 10, 5, 12, 0))
+                .basePrice(100)
+                .maxPrice(200)
+                .limitOfEnrollment(100)
+                .location("강남역 D2 스타트업 팩토리")
+                //.free(true)
+                //.offline(false)
                 .build();
 
-        //Stubbing EventRepository
+        //WebMvcTest 슬라이싱 테스트 진행을 위한 EventRepository Stubbing
         //Mockito.when(eventRepository.save(param)).thenReturn(param);
 
         //When
@@ -77,6 +92,39 @@ class EventControllerTest {
                 .andExpect(jsonPath("id").value(Matchers.not(100)))
                 .andExpect(jsonPath("free").value(Matchers.not(true)))
                 .andExpect(jsonPath("eventStatus").value(EventStatus.DRAFT.name()))
+                .andDo(print());
+    }
+
+    /**
+     * 이벤트 생성 요청 파라미터에 원하지 않는 요청 파라미터 건낼시 오류발생 확인
+     * @throws Exception -
+     */
+    @Test
+    void createEvent_badRequest() throws Exception {
+        //Given
+        Event param = Event.builder()
+                .id(100L)
+                .name("Spring")
+                .description("Inflearn REST API study with Spring")
+                .beginEnrollmentDateTime(LocalDateTime.of(2021,10,4,19,32))
+                .closeEnrollmentDateTime(LocalDateTime.of(2021, 10, 4, 22, 0))
+                .beginEventDateTime(LocalDateTime.of(2021, 10, 5, 12, 0))
+                .basePrice(100)
+                .maxPrice(200)
+                .limitOfEnrollment(100)
+                .location("강남역 D2 스타트업 팩토리")
+                .free(true)
+                .offline(false)
+                .eventStatus(EventStatus.PUBLISHED)
+                .build();
+
+        //When
+        mockMvc.perform(post("/api/events")
+                .contentType(MediaType.APPLICATION_PROBLEM_JSON_UTF8)
+                .accept(MediaTypes.HAL_JSON)
+                .content(objectMapper.writeValueAsString(param)))
+                //Then
+                .andExpect(status().isBadRequest())
                 .andDo(print());
     }
 }
