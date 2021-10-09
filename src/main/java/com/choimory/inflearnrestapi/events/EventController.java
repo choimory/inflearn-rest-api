@@ -1,6 +1,7 @@
 package com.choimory.inflearnrestapi.events;
 
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -20,13 +21,16 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @RequestMapping(value = "/api/events", produces = MediaTypes.HAL_JSON_VALUE)
 public class EventController {
     private final EventRepository eventRepository;
+    private final ModelMapper modelMapper;
 
     @PostMapping
-    public ResponseEntity<Event> createEvent(@RequestBody(required = false) Event param){
-        Event result = eventRepository.save(param);
+    public ResponseEntity<Event> createEvent(@RequestBody(required = false) EventRequestDto param){
+        Event entityParam = modelMapper.map(param, Event.class);
+        Event result = eventRepository.save(entityParam);
 
         //HATEOAS
-        URI uri = linkTo(EventController.class).slash(result.getId()).toUri();
+        URI uri = linkTo(EventController.class).slash(result.getId())
+                .toUri();
 
         return ResponseEntity.created(uri)
                 .body(result);
