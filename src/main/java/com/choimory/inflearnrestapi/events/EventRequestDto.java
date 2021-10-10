@@ -2,20 +2,14 @@ package com.choimory.inflearnrestapi.events;
 
 import lombok.*;
 
-import javax.persistence.*;
 import java.time.LocalDateTime;
 
-@Entity
 @Builder
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(of = "id")
-public class Event {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class EventRequestDto {
+    //private Long id;
     private String name;
     private String description;
     private LocalDateTime beginEnrollmentDateTime;
@@ -26,9 +20,6 @@ public class Event {
     private int basePrice;
     private int maxPrice;
     private Integer limitOfEnrollment;
-    private boolean offline;
-    private boolean free;
-    @Enumerated(EnumType.STRING)
-    @Builder.Default
-    private EventStatus eventStatus = EventStatus.DRAFT;
+    //private boolean offline;
+    //private boolean free;
 }
