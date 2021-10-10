@@ -3,18 +3,17 @@ package com.choimory.inflearnrestapi.events;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.hateoas.MediaTypes;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import javax.validation.Valid;
 import java.net.URI;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Controller
 @RequiredArgsConstructor
@@ -22,9 +21,23 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class EventController {
     private final EventRepository eventRepository;
     private final ModelMapper modelMapper;
+    private final EventValidator eventValidator;
 
     @PostMapping
-    public ResponseEntity<Event> createEvent(@RequestBody(required = false) EventRequestDto param){
+    public ResponseEntity<Event> createEvent(@RequestBody @Valid EventRequestDto param, Errors paramErrors){
+        //Spring 기본 Validation 진행
+        if(paramErrors.hasErrors()){
+            return ResponseEntity.badRequest()
+                    .build();
+        }
+
+        //Custom Validation 진행
+        eventValidator.validate(param, paramErrors);
+        if(paramErrors.hasErrors()){
+            return ResponseEntity.badRequest()
+                    .build();
+        }
+
         Event entityParam = modelMapper.map(param, Event.class);
         Event result = eventRepository.save(entityParam);
 

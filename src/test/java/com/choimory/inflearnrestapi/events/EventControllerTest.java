@@ -100,7 +100,7 @@ class EventControllerTest {
      * @throws Exception -
      */
     @Test
-    void createEvent_badRequest() throws Exception {
+    void createEvent_BadRequest_Wrong_Input() throws Exception {
         //Given
         Event param = Event.builder()
                 .id(100L)
@@ -124,6 +124,47 @@ class EventControllerTest {
                 .accept(MediaTypes.HAL_JSON)
                 .content(objectMapper.writeValueAsString(param)))
                 //Then
+                .andExpect(status().isBadRequest())
+                .andDo(print());
+    }
+
+    /**
+     * 필수값 미포함 요청시 400에러 응답 테스트
+     * @throws Exception -
+     */
+    @Test
+    void createEvent_BadRequest_Empty_Input() throws Exception{
+        EventRequestDto param = EventRequestDto.builder().build();
+
+        mockMvc.perform(post("/api/events")
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content(objectMapper.writeValueAsString(param)))
+                .andExpect(status().isBadRequest())
+                .andDo(print());
+    }
+
+    /**
+     * 종료일자가 시작일자보다 빠를때, 최대가격이 기본가격보다 낮을때 검증 테스트
+     * @throws Exception -
+     */
+    @Test
+    void createEvent_BadRequest_Wrong_Input2() throws Exception{
+        EventRequestDto param = EventRequestDto.builder()
+                .name("Spring")
+                .description("Inflearn REST API study with Spring")
+                .beginEnrollmentDateTime(LocalDateTime.of(2021,10,5,19,32))
+                .closeEnrollmentDateTime(LocalDateTime.of(2021, 10, 4, 22, 0))
+                .beginEventDateTime(LocalDateTime.of(2021, 10, 6, 12, 0))
+                .endEventDateTime(LocalDateTime.of(2021, 10, 5, 12, 0))
+                .basePrice(10000)
+                .maxPrice(200)
+                .limitOfEnrollment(100)
+                .location("강남역 D2 스타트업 팩토리")
+                .build();
+
+        mockMvc.perform(post("/api/events")
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content(objectMapper.writeValueAsString(param)))
                 .andExpect(status().isBadRequest())
                 .andDo(print());
     }

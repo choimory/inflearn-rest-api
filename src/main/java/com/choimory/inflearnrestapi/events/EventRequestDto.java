@@ -2,6 +2,9 @@ package com.choimory.inflearnrestapi.events;
 
 import lombok.*;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Builder
@@ -10,16 +13,25 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class EventRequestDto {
     //private Long id;
+    @NotEmpty
     private String name;
+    @NotEmpty
     private String description;
+    @NotNull
     private LocalDateTime beginEnrollmentDateTime;
+    @NotNull
     private LocalDateTime closeEnrollmentDateTime;
+    @NotNull
     private LocalDateTime beginEventDateTime;
+    @NotNull
     private LocalDateTime endEventDateTime;
     private String location;
+    @Min(0)
     private int basePrice;
+    @Min(0)
     private int maxPrice;
-    private Integer limitOfEnrollment;
+    @Min(0)
+    private int limitOfEnrollment;
     //private boolean offline;
     //private boolean free;
 }
