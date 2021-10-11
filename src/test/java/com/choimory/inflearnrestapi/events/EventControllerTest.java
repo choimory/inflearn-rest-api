@@ -27,18 +27,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(SpringExtension.class)
-//WebMvcTest 슬라이싱 테스트에서 SpringBootTest 통합테스트로 전환
-/*@WebMvcTest*/ @SpringBootTest @AutoConfigureMockMvc
-//WebMvcTest 슬라이싱 테스트시 ModelMapper 빈 생성을 위해
-//@Import({ModelMapperConfigTest.class})
+/*@WebMvcTest*/ @SpringBootTest @AutoConfigureMockMvc //WebMvcTest 슬라이싱 테스트에서 SpringBootTest 통합테스트로 전환
+//@Import({ModelMapperConfigTest.class}) //WebMvcTest 슬라이싱 테스트시 ModelMapper 빈 생성을 위해
 class EventControllerTest {
     @Autowired
     MockMvc mockMvc;
     @Autowired
     ObjectMapper objectMapper;
-    //WebMvcTest 슬라이싱 테스트 진행을 위한 EventRepository Mocking
     /*@MockBean
-    EventRepository eventRepository;*/
+    EventRepository eventRepository;*/ //WebMvcTest 슬라이싱 테스트 진행을 위한 EventRepository Mocking
 
     /**
      * 이벤트 생성 테스트
