@@ -10,15 +10,14 @@ import java.time.LocalDateTime;
 public class EventValidator {
     public void validate(EventRequestDto param, Errors errors){
         if((param.getBasePrice() > param.getMaxPrice()) && (param.getMaxPrice() > 0)){
-            errors.rejectValue("basePrice", "wrongValue", "basePrice is wrong");
-            errors.rejectValue("maxPrice", "wrongValue", "maxPrice is wrong");
+            errors.reject("wrongPrices", "prices are wrong"); //errors.reject() -> 글로벌 에러 (요청(객체) 전체에 대한 에러 정보)
         }
 
         LocalDateTime endEventDateTime = param.getEndEventDateTime();
         if(endEventDateTime.isBefore(param.getBeginEventDateTime())
                 || endEventDateTime.isBefore(param.getCloseEnrollmentDateTime())
                 || endEventDateTime.isBefore(param.getBeginEnrollmentDateTime())){
-            errors.rejectValue("endEventDateTime", "wrongValue", "endEventDateTime is wrong");
+            errors.rejectValue("endEventDateTime", "wrongValue", "endEventDateTime is wrong"); //errors.rejectValue() -> 필드 에러 (해당 필드에 대한 에러 정보)
         }
 
         //TODO beginEventDateTime Valid

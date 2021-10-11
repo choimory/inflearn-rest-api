@@ -24,18 +24,18 @@ public class EventController {
     private final EventValidator eventValidator;
 
     @PostMapping
-    public ResponseEntity<Event> createEvent(@RequestBody @Valid EventRequestDto param, Errors paramErrors){
+    public ResponseEntity createEvent(@RequestBody @Valid EventRequestDto param, Errors paramErrors){
         //Spring 기본 Validation 진행
         if(paramErrors.hasErrors()){
             return ResponseEntity.badRequest()
-                    .build();
+                    .body(paramErrors);
         }
 
         //Custom Validation 진행
         eventValidator.validate(param, paramErrors);
         if(paramErrors.hasErrors()){
             return ResponseEntity.badRequest()
-                    .build();
+                    .body(paramErrors);
         }
 
         Event entityParam = modelMapper.map(param, Event.class);

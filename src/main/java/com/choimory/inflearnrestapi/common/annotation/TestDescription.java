@@ -1,4 +1,4 @@
-package com.choimory.inflearnrestapi;
+package com.choimory.inflearnrestapi.common.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
