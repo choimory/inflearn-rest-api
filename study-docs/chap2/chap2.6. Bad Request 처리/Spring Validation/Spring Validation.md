@@ -1,6 +1,6 @@
 # 의존성 추가
 
-```shell
+```bash
 // Gradle
 implementation 'org.springframework.boot:spring-boot-starter-validation'
 
@@ -20,34 +20,50 @@ implementation 'org.springframework.boot:spring-boot-starter-validation'
 - javax.validation.Valid
 - Spring MVC에 해당하는 부분으로 컨트롤러의 매개변수에 해당 어노테이션을 붙이면 디스패처 서블릿이 컨트롤러 매개변수에 바인딩할때 검증처리를 진행해준다
 
-# Validation 기본 제공 어노테이션
+# Errors
 
 ![img_1.png](img_1.png)
+
+- @Valid가 붙은 파라미터 바로 오른쪽에 Errors라는 매개변수를 선언해주면, 왼쪽의 @Valid 매개변수가 검증 실패시 오른쪽의 Errors 매개변수에 오류 내용이 바인딩된다.
+  - 주의할점은 매개변수의 선언순서인데, Errors 매개변수를 @Valid 매개변수 바로 다음에 이어서 선언해야한다는 점을 유의해야한다
+
+# Validation 기본 제공 어노테이션
+
+![img_2.png](img_2.png)
 
 - @NotEmpty, @NotNull, @Min(value), @Max(value) 등 javax.validation.constraints 하위 어노테이션들을 사용하여 옵션을 지정해줌
 - 해당 어노테이션을 이용해 검증을 진행해준다
 
-# @Validated, 제약 그룹핑
+# 컨트롤러 외 @Valid 진행 클래스는 @Validated를 붙여준다
 
 ```java
 @Validated //여기에 추가
 @Service
 public class ContactService {
-	//'@Valid'가 설정된 메서드가 호출될 때 유효성 검사를 진행한다.
+		//'@Valid'가 설정된 메서드가 호출될 때 유효성 검사를 진행한다.
     public void createContact(@Valid CreateContact createContact) { 
         //Do Something
     }
 }
 ```
 
-- @Valid가 진행되는 클래스, 메소드에는 @Validated 어노테이션을 붙여준다
+- 기본적으로 @Valid가 진행되는 클래스에는 @Validated 어노테이션을 붙여주어야함
 - 단 컨트롤러는 @Validated없이 @Valid만 붙여도 바로 사용이 가능하다
-    - 디스패처 서블릿이 바인딩을 진행하기 때문이다
+  - 디스패처 서블릿이 바인딩을 진행하기 때문이다
+
+# @Validated, 제약조건 그룹핑
+
+> 제약조건 어노테이션이 붙은 RequestDto를 요청마다 다르게 검증하고 싶다면? groups 속성과 @Validated을 이용하여 특정 제약만 검증을 진행하게 할 수 있다
+>
+
+## @Validated를 사용한 특정 제약조건만 검증하기
 
 ```java
 public interface Ad {
 }
+```
 
+```java
 public class Message {
     @Length(max = 128)
     @NotEmpty
@@ -85,7 +101,7 @@ public class MessageService {
      * - https://docs.spring.io/spring/docs/5.2.3.RELEASE/spring-framework-reference/core.html#aop-understanding-aop-proxies
      */
     public void sendMessage(Message message, boolean isAd) {
-        if (isAd) {
+        if (isAd) { 
             sendAdMessage(message);
         } else {
             sendNormalMessage(message);
@@ -95,19 +111,12 @@ public class MessageService {
 
 - 메소드에 @Validated(그룹클래스.class)를 작성하면 해당 제약그룹만 검증을 진행할수 있다
 - 참고
-    - @Valid가 진행되는 메소드를 다른 메소드에서 호출할시 AOP 구조상 검증이 진행되지 않는다
-
-# Errors
-
-![img_2.png](img_2.png)
-
-- @Valid가 붙은 파라미터 바로 오른쪽에 Errors라는 매개변수를 선언해주면, 왼쪽의 @Valid 매개변수가 검증 실패시 오른쪽의 Errors 매개변수에 오류 내용이 바인딩된다.
-    - 주의할점은 매개변수의 선언순서인데, Errors 매개변수를 @Valid 매개변수 바로 다음에 이어서 선언해야한다는 점을 유의해야한다
+  - @Valid가 진행되는 메소드를 다른 메소드에서 호출할시 AOP 구조상 검증이 진행되지 않는다
 
 # 커스텀 Validator 작성
 
-- 기본제공 어노테이션으로 검증을 진행하기 힘든 복잡한 검증은 커스텀 Validator을 작성하여 진행할 수 있다
-- 하나의 방법일 뿐
+> 기본제공 어노테이션으로 검증을 진행하기 힘든 복잡한 검증은 커스텀 Validator을 작성하여 진행할 수 있다
+>
 
 ## Custom Validator 1
 
@@ -125,45 +134,58 @@ public class MessageService {
 ## Custom Validator 2
 
 ```java
-@Target({METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE})
+@Target({METHOD, FIELD, TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE})
 @Retention(RUNTIME)
-@Constraint(validatedBy = NoEmojiValidator.class)
+@Constraint(validatedBy = SmsBytesSizeValidator.class) //커스텀 Validator 클래스 지정
 @Documented
-public @interface NoEmoji{
-    String message() default "Emoji is not allowed";
+public @interface SmsBytesSize {
+    String message() default "";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
-
-    @Target({METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER})
-    @Retention(RUNTIME)
-    @Documented
-    @interface List{
-        NoEmoji[] value();
-    }
 }
 ```
 
 - 커스텀 어노테이션 작성
 
 ```java
-public class NoEmojiValidator implements ConstraintValidator<NoEmoji, String> {
+//implements ConstraintValidator<어노테이션, 검증값의 타입>
+public class SmsBytesSizeValidator implements ConstraintValidator<SmsBytesSize, String> {
+
+		//커스텀 어노테이션의 Constraint 어노테이션에서 Value를 받기로 했다면 initialize안에서 초기화해주어야 함
+    @Override
+    public void initialize(SmsBytesSize constraintAnnotation) {
+
+    }
+
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
-        if (StringUtils.isEmpty(value) == true) {
-            return true;
+        int count = 0;
+        try {
+            count = value.getBytes("EUC-KR").length;
+            addConstraintViolation(
+                    context, "90bytes 초과"
+            );
+            return count < 90 ? true : false;
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
         }
+        return true;
+    }
 
-        return EmojiParser.parseToAliases(value).equals(value);
+    private void addConstraintViolation(ConstraintValidatorContext context, String msg) {
+        context.disableDefaultConstraintViolation();
+        context.buildConstraintViolationWithTemplate(msg).addConstraintViolation();
     }
 }
 ```
 
-- ConstraintValidator<어노테이션, String> 구현 클래스 작성
+- ConstraintValidator<어노테이션, 검증할 값의 타입> 구현 클래스 작성
 - isValid() 오버라이드하여 검증 로직 작성
+- initialize()는 커스텀 어노테이션의 @Constraint 어노테이션에 value가 들어갈시 해당 값을 initialize()에서 받아서 초기화 해주어야함
 
 ```java
 public class CreateContact {
-    @NoEmoji
+    @SmsBytesSize 
     @Length(max = 64)
     @NotBlank
     private String uid;
