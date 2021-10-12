@@ -211,6 +211,7 @@ class EventControllerTest {
     }
 
     @Test
+    @DisplayName("free 응답값 확인")
     public void testOffline(){
         //given
         Event event = Event.builder()
