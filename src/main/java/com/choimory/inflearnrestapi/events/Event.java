@@ -1,6 +1,7 @@
 package com.choimory.inflearnrestapi.events;
 
 import lombok.*;
+import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -31,4 +32,20 @@ public class Event {
     @Enumerated(EnumType.STRING)
     @Builder.Default
     private EventStatus eventStatus = EventStatus.DRAFT;
+
+    public void update(){
+        //update free
+        if(basePrice == 0 && maxPrice == 0){
+            free = true;
+        } else {
+            free = false;
+        }
+
+        //update offline
+        if (location == null || location.isBlank()){
+            offline = false;
+        } else {
+            offline = true;
+        }
+    }
 }

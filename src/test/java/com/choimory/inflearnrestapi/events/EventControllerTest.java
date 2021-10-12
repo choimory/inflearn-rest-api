@@ -2,6 +2,7 @@ package com.choimory.inflearnrestapi.events;
 
 import com.choimory.inflearnrestapi.common.annotation.TestDescription;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.assertj.core.api.Assertions;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,7 +17,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
-
+import static org.assertj.core.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -90,8 +91,8 @@ class EventControllerTest {
                 .andExpect(header().exists(HttpHeaders.LOCATION)) //.andExpect(header().exists("Location"))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_VALUE)) //.andExpect(header().string("Content-Type", "application/hal+json"))
                 .andExpect(redirectedUrlPattern("http://{host}/api/events/{generated_id}"))
-                .andExpect(jsonPath("id").value(Matchers.not(100)))
-                .andExpect(jsonPath("free").value(Matchers.not(true)))
+                .andExpect(jsonPath("free").value(false))
+                .andExpect(jsonPath("offline").value(true))
                 .andExpect(jsonPath("eventStatus").value(EventStatus.DRAFT.name()))
                 .andDo(print());
     }
@@ -179,5 +180,57 @@ class EventControllerTest {
                 .andExpect(jsonPath("$[0].code").exists())
                 //.andExpect(jsonPath("$[0].rejectedValue").exists())
                 .andDo(print());
+    }
+
+    @Test
+    @DisplayName("free 응답값 확인")
+    public void testFree(){
+        //given
+        Event event = Event.builder()
+                .basePrice(0)
+                .maxPrice(0)
+                .build();
+
+        //when
+        event.update();
+
+        //then
+        Assertions.assertThat(event.isFree()).isTrue();
+
+        //given
+        Event event2 = Event.builder()
+                .basePrice(0)
+                .maxPrice(100)
+                .build();
+
+        //when
+        event2.update();
+
+        //then
+        Assertions.assertThat(event2.isFree()).isFalse();
+    }
+
+    @Test
+    public void testOffline(){
+        //given
+        Event event = Event.builder()
+                .location("강남역 네이버 D2 스타트업 팩토리")
+                .build();
+
+        //when
+        event.update();
+
+        //then
+        assertThat(event.isOffline()).isTrue();
+
+        //given
+        Event event2 = Event.builder()
+                .build();
+
+        //when
+        event2.update();
+
+        //then
+        assertThat(event2.isOffline()).isFalse();
     }
 }
