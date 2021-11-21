@@ -3,6 +3,8 @@ package com.choimory.inflearnrestapi.events;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.hateoas.MediaTypes;
+import org.springframework.hateoas.server.core.LinkBuilderSupport;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
@@ -14,7 +16,6 @@ import javax.validation.Valid;
 import java.net.URI;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Controller
 @RequiredArgsConstructor
@@ -44,10 +45,21 @@ public class EventController {
         Event result = eventRepository.save(entityParam);
 
         //HATEOAS
-        URI uri = linkTo(EventController.class).slash(result.getId())
-                .toUri();
+        //chap3. 재사용하는 형식으로 변경
+        /*URI uri = linkTo(EventController.class).slash(result.getId())
+                .toUri();*/
+        LinkBuilderSupport<WebMvcLinkBuilder> selfLinkBuilderSupport = linkTo(EventController.class).slash(result.getId());
+        URI uri = selfLinkBuilderSupport.toUri();
+
+        //chap3.링크 정보를 같이 제공해 줄수 있는 ResourceSupport 객체로 반환하는 코드로 변경
+        /*return ResponseEntity.created(uri)
+                .body(result);*/
+        EventResource eventResource = new EventResource(result);
+        //eventResource.add(selfLinkBuilderSupport.withSelfRel()); 항상 포함되어야 하는 내용이므로 생성자에서 호출시키도록 함
+        eventResource.add(linkTo(EventController.class).withRel("query-events"));
+        eventResource.add(selfLinkBuilderSupport.withRel("update-event"));
 
         return ResponseEntity.created(uri)
-                .body(result);
+                .body(eventResource);
     }
 }
